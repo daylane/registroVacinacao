@@ -37,18 +37,22 @@ public class VacinacaoService {
     {
         var paciente = PacienteHttpClient.obterpaciente(id);
         logger.info("Pesquisando paciente;" + (paciente != null ? paciente.getNome() : "Não encontrado"));
+       if(paciente != null){
+           var vacinacaoResponse = vacinacaoRepository.findByIdPaciente(paciente.getId());
 
-        var vacinacaoResponse = vacinacaoRepository.findByIdPaciente(paciente.getId());
+           if (vacinacaoResponse != null && vacinacaoResponse.getBody() != null) {
+               var vacinacao = vacinacaoResponse.getBody();
+               logger.info("Pesquisando se paciente já foi vacinado; ID: " + vacinacao.getIdPaciente());
 
-        if (vacinacaoResponse != null && vacinacaoResponse.getBody() != null) {
-            var vacinacao = vacinacaoResponse.getBody();
-            logger.info("Pesquisando se paciente já foi vacinado; ID: " + vacinacao.getIdPaciente());
-
-            return new PacienteDoseDto(paciente, vacinacao);
-        } else {
-            logger.info("Paciente não foi vacinado ou não encontrado; ID: " + id);
-            return new PacienteDoseDto(paciente, null);
-        }
+               return new PacienteDoseDto(paciente, vacinacao);
+           } else {
+               logger.info("Paciente não foi vacinado ou não encontrado; ID: " + id);
+               return new PacienteDoseDto(paciente, null);
+           }
+       }
+       else {
+           return  null;
+       }
 
     }
     public Vacinacao registrarVacinacao(Vacinacao vacinacao){
