@@ -1,5 +1,6 @@
 package br.edu.unime.Vacinacao.controller;
 
+import br.edu.unime.Vacinacao.dto.PacienteDoseDto;
 import br.edu.unime.Vacinacao.entity.Paciente;
 import br.edu.unime.Vacinacao.entity.Vacinacao;
 import br.edu.unime.Vacinacao.httpClient.PacienteHttpClient;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -23,20 +25,18 @@ public class VacinacaoController {
     PacienteHttpClient pacienteHttpClient;
 
     @GetMapping
-    public ResponseEntity<Vacinacao> obterVacinacoes(){
+    public List<Vacinacao> obterVacinacoes(){
         try{
-            vacinacaoService.obterVacinacoes();
-            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+            return vacinacaoService.obterVacinacoes();
         }
         catch (Exception ex){
             throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Não foi possível obter vacinações", ex);
         }
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Vacinacao> obterVacinacoesPorId(@PathVariable String id){
+    public Optional<Vacinacao> obterVacinacoesPorId(@PathVariable String id){
         try{
-            vacinacaoService.obterVacinacaoPorId(id);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+            return vacinacaoService.obterVacinacaoPorId(id);
         }
         catch (Exception ex){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível obter vacinação", ex);
@@ -72,10 +72,9 @@ public class VacinacaoController {
         }
     }
     @GetMapping("pacienteVacina/{id}")
-    public ResponseEntity<Paciente> obterPacienteVacina(@PathVariable String id){
+    public PacienteDoseDto obterPacienteVacina(@PathVariable String id){
         try{
-            vacinacaoService.obterVacinacaoPorIdpaciente(id);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+            return  vacinacaoService.obterVacinacaoPorIdpaciente(id);
         }
         catch (Exception ex){
             throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Não foi possível obter vacinações", ex);
