@@ -11,8 +11,6 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor
 @Builder
 public class ProfissionalSaude {
-    @Id
-    private String id;
     private String cpf;
     private String nome;
 }

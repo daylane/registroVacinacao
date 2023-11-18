@@ -1,6 +1,9 @@
 package br.edu.unime.Vacinacao.service;
 
 import br.edu.unime.Vacinacao.dto.PacienteDoseDto;
+import br.edu.unime.Vacinacao.dto.PacientePorEstadoDto;
+import br.edu.unime.Vacinacao.dto.VacinasAplicadasDto;
+import br.edu.unime.Vacinacao.dto.VacinasAplicadasPorFabricanteDto;
 import br.edu.unime.Vacinacao.entity.Paciente;
 import br.edu.unime.Vacinacao.entity.Vacinacao;
 import br.edu.unime.Vacinacao.httpClient.PacienteHttpClient;
@@ -11,7 +14,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,27 +38,24 @@ public class VacinacaoService {
         return vacinacaoRepository.findById(id);
 
     }
-    public PacienteDoseDto obterVacinacaoPorIdpaciente(String id)
+    public PacienteDoseDto obterDosePacienteporIdvacinacao(String id)
     {
-        var paciente = PacienteHttpClient.obterpaciente(id);
+        logger.info("Pesquisando Vacinação;");
+        var vacinacao = obterVacinacaoPorId(id);
+        var paciente = PacienteHttpClient.obterpaciente(vacinacao.get().getCpfPaciente());
         logger.info("Pesquisando paciente;" + (paciente != null ? paciente.getNome() : "Não encontrado"));
-       if(paciente != null){
-           var vacinacaoResponse = vacinacaoRepository.findByIdPaciente(paciente.getId());
 
-           if (vacinacaoResponse != null && vacinacaoResponse.getBody() != null) {
-               var vacinacao = vacinacaoResponse.getBody();
-               logger.info("Pesquisando se paciente já foi vacinado; ID: " + vacinacao.getIdPaciente());
+        PacienteDoseDto pacienteDoseDto = new PacienteDoseDto(
+                paciente.getNome(),
+                paciente.getCpf(),
+                paciente.getDataNascimento(),
+                vacinacao.get().getDose(),
+                vacinacao.get().getDataVacinacao()
+        );
+       /* pacienteDoseDto.setPaciente(paciente);
+        pacienteDoseDto.setVacinacao(vacinacao.get());*/
 
-               return new PacienteDoseDto(paciente, vacinacao);
-           } else {
-               logger.info("Paciente não foi vacinado ou não encontrado; ID: " + id);
-               return new PacienteDoseDto(paciente, null);
-           }
-       }
-       else {
-           return  null;
-       }
-
+        return pacienteDoseDto;
     }
     public Vacinacao registrarVacinacao(Vacinacao vacinacao){
         logger.info("Inserindo vacinacao");
@@ -79,6 +81,40 @@ public class VacinacaoService {
 
         vacinacao.ifPresent(value -> vacinacaoRepository.delete(value));
     }
+
+    public VacinasAplicadasDto vacinasAplicadas(String uf){
+            VacinasAplicadasDto vacinasAplicadasDto = new VacinasAplicadasDto();
+
+            if(StringUtils.isEmpty(uf)){
+                logger.info("Buscando total sem uf"  );
+                var vacinas = vacinacaoRepository.count();
+                vacinasAplicadasDto.setTotalVacinas(vacinas);
+
+                return vacinasAplicadasDto;
+            }
+            else {
+                logger.info("Buscando total com uf"  );
+               List<PacientePorEstadoDto> pacientePorEstado = PacienteHttpClient.obterPacienteEstado(uf);
+
+               for(PacientePorEstadoDto paciente : pacientePorEstado){
+
+                   logger.info("entrou no for");
+                   String cpf = paciente.getCpf();
+
+                   long vacinacao = vacinacaoRepository.countByCpfPaciente(cpf);
+
+                   vacinasAplicadasDto.setTotalVacinas(vacinacao);
+
+               }
+
+           return  vacinasAplicadasDto;
+            }
+    }
+
+   /* public VacinasAplicadasPorFabricanteDto vacinasAplicadasPorFabricante(String estado){
+
+    }*/
+
 
 
 }

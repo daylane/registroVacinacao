@@ -4,7 +4,8 @@ import br.edu.unime.Vacinacao.entity.Vacinacao;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.http.ResponseEntity;
 
-public interface VacinacaoRepository extends MongoRepository<Vacinacao, String> {
+import java.util.List;
 
-    public ResponseEntity<Vacinacao> findByIdPaciente(String idPaciente);
+public interface VacinacaoRepository extends MongoRepository<Vacinacao, String> {
+ long countByCpfPaciente(String cpfPaciente);
 }

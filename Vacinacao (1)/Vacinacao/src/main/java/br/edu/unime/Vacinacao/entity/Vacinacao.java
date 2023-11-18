@@ -23,7 +23,7 @@ public class Vacinacao {
     @NotEmpty(message = "Data não foi informada!")
     private LocalDate dataVacinacao;
     @NotEmpty(message = "paciente não foi informada!")
-    private String idPaciente;
+    private String cpfPaciente;
     @NotEmpty(message = "Vacina não foi informada")
     private String idVacina;
     private int dose;

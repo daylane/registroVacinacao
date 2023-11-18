@@ -18,3 +18,4 @@ public class VacinacaoApplication {
 		SpringApplication.run(VacinacaoApplication.class, args);
 	}
 }
+

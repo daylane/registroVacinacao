@@ -1,6 +1,7 @@
 package br.edu.unime.Vacinacao.controller;
 
 import br.edu.unime.Vacinacao.dto.PacienteDoseDto;
+import br.edu.unime.Vacinacao.dto.VacinasAplicadasDto;
 import br.edu.unime.Vacinacao.entity.Paciente;
 import br.edu.unime.Vacinacao.entity.Vacinacao;
 import br.edu.unime.Vacinacao.httpClient.PacienteHttpClient;
@@ -34,19 +35,25 @@ public class VacinacaoController {
         }
     }
     @GetMapping("/{id}")
-    public Optional<Vacinacao> obterVacinacoesPorId(@PathVariable String id){
+    public ResponseEntity<Vacinacao> obterVacinacoesPorId(@PathVariable String id){
         try{
-            return vacinacaoService.obterVacinacaoPorId(id);
+
+           Optional<Vacinacao> vacinacao = vacinacaoService.obterVacinacaoPorId(id);
+           if(vacinacao.isPresent()){
+               return new ResponseEntity<Vacinacao>(vacinacao.get(), HttpStatus.OK);
+           }
+           else {
+               return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+           }
         }
         catch (Exception ex){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível obter vacinação", ex);
         }
     }
     @PostMapping("/registrar-vacinacao")
-    public ResponseEntity<Vacinacao> registrarVacinacao(@RequestBody Vacinacao vacinacao){
+    public Vacinacao registrarVacinacao(@RequestBody Vacinacao vacinacao){
         try {
-            vacinacaoService.registrarVacinacao(vacinacao);
-            return ResponseEntity.created(null).body(vacinacao);
+            return vacinacaoService.registrarVacinacao(vacinacao);
         }
         catch (Exception ex){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível registrar vacinação", ex);
@@ -68,17 +75,28 @@ public class VacinacaoController {
             vacinacaoService.deletarVacinacao(id);
             return ResponseEntity.noContent().build();
         }catch (Exception ex){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível deletar vacinação", ex);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível deletar vacinação", ex);
         }
     }
-    @GetMapping("pacienteVacina/{id}")
-    public PacienteDoseDto obterPacienteVacina(@PathVariable String id){
+    @GetMapping("dosePaciente/{id}")
+    public PacienteDoseDto obterDosePaciente(@PathVariable String id){
         try{
-            return  vacinacaoService.obterVacinacaoPorIdpaciente(id);
+            return  vacinacaoService.obterDosePacienteporIdvacinacao(id);
         }
         catch (Exception ex){
             throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Não foi possível obter vacinações", ex);
         }
     }
 
+    @GetMapping("totalVacinas")
+    public VacinasAplicadasDto totalVacinas(@RequestParam(required = false) String uf){
+        try{
+            return  vacinacaoService.vacinasAplicadas(uf);
+        }
+        catch (Exception ex){
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Não foi possível obter total de vacinas", ex);
+        }
+    }
+
 }
+
