@@ -1,9 +1,6 @@
-## API de Gerenciamento de Vacinação
-
-## Introdução
-
-
-Esta é uma API de Gerenciamento de Vacinação desenvolvida pela equipe Sanhok permite o controle e registro de vacinações de pacientes, gerenciamento de vacinas e pacientes, e fornece informações estatísticas sobre a vacinação. A API foi desenvolvida para atender aos requisitos do projeto "Programação Web 2 - Oficial 2".
+# Projeto de Gerenciamento de Vacinações
+Bem-vindo ao Projeto de Gerenciamento de Vacinações.
+Este sistema é responsável por gerenciar informações de Vacinações.
 
 ##  Conteúdo do README
 
@@ -17,6 +14,13 @@ Esta é uma API de Gerenciamento de Vacinação desenvolvida pela equipe Sanhok 
   
 ##    Visão Geral
 
+A api de Gerenciamento de Vacinações  permite o cadastro, atualização, remoção e consulta de informações de vacinações realizadas pelo nossos prifissionais de saúde.
+## As tecnologias principais utilizadas são:
+- [Spring Boot](https://spring.io/projects/spring-boot/)
+- [MongoDB](https://www.mongodb.com/pt-br)
+- Feign Client.
+- [Postman](https://www.postman.com/)
+- 
 A API é projetada para fornecer as seguintes funcionalidades:
 
 - Registro de vacinações de pacientes.
