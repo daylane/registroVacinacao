@@ -25,7 +25,7 @@ public class Vacinacao {
     @NotEmpty(message = "paciente não foi informada!")
     private String cpfPaciente;
     @NotEmpty(message = "Vacina não foi informada")
-    private String idVacina;
+    private String nomeVacina;
     private int dose;
     private List<ProfissionalSaude> profissionalSaude;
 }

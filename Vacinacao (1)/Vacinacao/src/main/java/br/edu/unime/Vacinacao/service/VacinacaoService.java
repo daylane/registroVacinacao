@@ -52,8 +52,6 @@ public class VacinacaoService {
                 vacinacao.get().getDose(),
                 vacinacao.get().getDataVacinacao()
         );
-       /* pacienteDoseDto.setPaciente(paciente);
-        pacienteDoseDto.setVacinacao(vacinacao.get());*/
 
         return pacienteDoseDto;
     }
