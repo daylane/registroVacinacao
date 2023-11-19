@@ -53,11 +53,12 @@ A API é projetada para fornecer as seguintes funcionalidades:
 ###  Uso
 -A API oferece vários endpoints para criar, ler, atualizar e excluir registros de vacinação, bem como para consultar informações estatísticas. Certifique-se de seguir a documentação dos endpoints.
 
-- GET /api/vacinacao : Retorna uma lista de todas as vacinas cadastradas no banco de dados
-- GET /api/vacinacao/{id} : Retorna a vacina com o id especificado
-- POST /api/vacinacao/registrarvacina : Cria uma nova vacina com os dados enviados no corpo da requisição
-- PUT /api/vacinacao/atualizarVacina/{id} : Atualiza a vacina com o id especificado com os dados enviados no corpo da requisição
-- DELETE /api/vacinacao/{id} : Deleta a vacina com o id especificado
+- POST /api/vacinacoes/vacinasmock: Faz injestão de dados no banco de dados local
+- GET /api/vacinacoes : Retorna uma lista de todas as vacinas cadastradas no banco de dados
+- GET /api/vacinacoes/{id} : Retorna a vacina com o id especificado
+- POST /api/vacinacoes/registrarvacina : Cria uma nova vacina com os dados enviados no corpo da requisição
+- PUT /api/vacinacoes/atualizarVacina/{id} : Atualiza a vacina com o id especificado com os dados enviados no corpo da requisição
+- DELETE /api/vacinacoes/{id} : Deleta a vacina com o id especificado
 
   
 O formato dos dados das vacinações é o seguinte:
