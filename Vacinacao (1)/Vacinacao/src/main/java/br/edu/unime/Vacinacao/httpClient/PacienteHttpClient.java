@@ -19,6 +19,6 @@ public interface PacienteHttpClient {
     public Paciente obterpaciente(@PathVariable("id") String id);
 
     @GetMapping("Pacientes/por-uf")
-    public List<PacientePorEstadoDto> obterPacienteEstado(@RequestParam(required = false) String uf);
+    public  List<PacientePorEstadoDto> obterPacienteEstado(@RequestParam(required = false) String uf);
 
 }

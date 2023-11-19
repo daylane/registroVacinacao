@@ -11,5 +11,6 @@ public class VacinasAplicadasPorFabricanteDto {
 
     private String fabricante;
     private String vacina;
-    private long doses_aplicadas;
+    private int total_de_doses;
+    private int intervalo_entre_doses;
 }

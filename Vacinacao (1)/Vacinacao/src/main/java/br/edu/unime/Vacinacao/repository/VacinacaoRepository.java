@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface VacinacaoRepository extends MongoRepository<Vacinacao, String> {
  long countByCpfPaciente(String cpfPaciente);
+ Vacinacao findByCpfPaciente(String cpfPaciente);
 }

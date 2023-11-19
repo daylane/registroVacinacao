@@ -1,12 +1,11 @@
 package br.edu.unime.Vacinacao.service;
 
-import br.edu.unime.Vacinacao.dto.PacienteDoseDto;
-import br.edu.unime.Vacinacao.dto.PacientePorEstadoDto;
-import br.edu.unime.Vacinacao.dto.VacinasAplicadasDto;
-import br.edu.unime.Vacinacao.dto.VacinasAplicadasPorFabricanteDto;
+import br.edu.unime.Vacinacao.dto.*;
 import br.edu.unime.Vacinacao.entity.Paciente;
+import br.edu.unime.Vacinacao.entity.Vacina;
 import br.edu.unime.Vacinacao.entity.Vacinacao;
 import br.edu.unime.Vacinacao.httpClient.PacienteHttpClient;
+import br.edu.unime.Vacinacao.httpClient.VacinaHttpClient;
 import br.edu.unime.Vacinacao.repository.VacinacaoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +27,9 @@ public class VacinacaoService {
     @Autowired
     private VacinacaoRepository vacinacaoRepository;
     @Autowired
-    PacienteHttpClient PacienteHttpClient;
+    PacienteHttpClient pacienteHttpClient;
+    @Autowired
+    VacinaHttpClient vacinaHttpClient;
 
     public List<Vacinacao> obterVacinacoes(){
         logger.info("Buscando todas as vacinacao por id;");
@@ -42,7 +44,7 @@ public class VacinacaoService {
     {
         logger.info("Pesquisando Vacinação;");
         var vacinacao = obterVacinacaoPorId(id);
-        var paciente = PacienteHttpClient.obterpaciente(vacinacao.get().getCpfPaciente());
+        var paciente = pacienteHttpClient.obterpaciente(vacinacao.get().getCpfPaciente());
         logger.info("Pesquisando paciente;" + (paciente != null ? paciente.getNome() : "Não encontrado"));
 
         PacienteDoseDto pacienteDoseDto = new PacienteDoseDto(
@@ -64,7 +66,7 @@ public class VacinacaoService {
         Optional<Vacinacao> vacinacaoRegistrada = obterVacinacaoPorId(id);
 
         if(vacinacaoRegistrada.isPresent()){
-            logger.info("Atualizando Vacinacao;" + vacinacaoRegistrada.get().getIdVacina());
+            logger.info("Atualizando Vacinacao;");
 
             BeanUtils.copyProperties(vacinacao, vacinacaoRegistrada);
             vacinacaoRepository.save(vacinacaoRegistrada.get());
@@ -75,7 +77,7 @@ public class VacinacaoService {
     }
     public void deletarVacinacao(String id) {
      Optional<Vacinacao> vacinacao = obterVacinacaoPorId(id);
-        logger.info("Deletando Vacinacao;" + vacinacao.get().getIdVacina());
+        logger.info("Deletando Vacinacao;");
 
         vacinacao.ifPresent(value -> vacinacaoRepository.delete(value));
     }
@@ -92,7 +94,7 @@ public class VacinacaoService {
             }
             else {
                 logger.info("Buscando total com uf"  );
-               List<PacientePorEstadoDto> pacientePorEstado = PacienteHttpClient.obterPacienteEstado(uf);
+               List<PacientePorEstadoDto> pacientePorEstado = pacienteHttpClient.obterPacienteEstado(uf.toUpperCase());
 
                for(PacientePorEstadoDto paciente : pacientePorEstado){
 
@@ -108,11 +110,19 @@ public class VacinacaoService {
            return  vacinasAplicadasDto;
             }
     }
+    public PacienteDoseAtrasadaDto doseAtrasada(String uf){
+        LocalDate dataHoje = LocalDate.now();
 
-   /* public VacinasAplicadasPorFabricanteDto vacinasAplicadasPorFabricante(String estado){
+        logger.info("procurando vacina" );
+        List<VacinasAplicadasPorFabricanteDto> vacina = vacinaHttpClient.listarVacinas();
 
-    }*/
+        logger.info("procurando Paciente" );
+        List<PacientePorEstadoDto> paciente = pacienteHttpClient.obterPacienteEstado(uf.toUpperCase());
 
+        PacienteDoseAtrasadaDto pacienteDoseAtrasada = new PacienteDoseAtrasadaDto(paciente,vacina);
+
+        return pacienteDoseAtrasada;
+    }
 
 
 }

@@ -1,5 +1,6 @@
 package br.edu.unime.Vacinacao.controller;
 
+import br.edu.unime.Vacinacao.dto.PacienteDoseAtrasadaDto;
 import br.edu.unime.Vacinacao.dto.PacienteDoseDto;
 import br.edu.unime.Vacinacao.dto.VacinasAplicadasDto;
 import br.edu.unime.Vacinacao.entity.Paciente;
@@ -45,6 +46,15 @@ public class VacinacaoController {
            else {
                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
            }
+        }
+        catch (Exception ex){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível obter vacinação", ex);
+        }
+    }
+    @GetMapping("/paciente/doseAtrasada")
+    public PacienteDoseAtrasadaDto obterDosesAtrasadas(@RequestParam(required = false) String uf){
+        try{
+            return vacinacaoService.doseAtrasada(uf);
         }
         catch (Exception ex){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível obter vacinação", ex);
