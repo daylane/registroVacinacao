@@ -109,7 +109,7 @@ O formato dos dados das vacinações é o seguinte:
 ###  Endpoints
 
 - [/api/vacinas](https://github.com/daylane/Vacina): Gerenciamento de informações sobre vacinas.
-- [/api/pacientes](#https://github.com/Lipe15/APi2): Gerenciamento de informações sobre pacientes.
+- [/api/pacientes](https://github.com/Lipe15/APi2): Gerenciamento de informações sobre pacientes.
 - [/api/vacinacoes](#vacinacoes): Registro de vacinações de pacientes.
 
 
