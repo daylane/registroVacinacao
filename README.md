@@ -42,6 +42,13 @@ A API é projetada para fornecer as seguintes funcionalidades:
 - c. 	Configure as propriedades do aplicativo:
       •	Abra o arquivo application.properties no diretório src/main/resources.
       •	Ajuste as configurações do MongoDB conforme necessário.
+  
+### Banco de dados
+
+- a.  Iniciar uma nova conexão com a URL: mongodb://localhost:27017.
+- b.  Criar uma nova database com o nome de "sus-api".
+- c.  Dar o nome da primeira "collection" de "vacina".
+
 
 ###  Uso
 -A API oferece vários endpoints para criar, ler, atualizar e excluir registros de vacinação, bem como para consultar informações estatísticas. Certifique-se de seguir a documentação dos endpoints.
@@ -59,19 +66,17 @@ O formato dos dados das vacinações é o seguinte:
 
       Post  http: //localhost:8082/api/vacinacao/registrar-vacinacao
   
-- Post Exemplo de Resposta:
+- Post Exemplo:
   {
-      "id": 1,
       "dataVacinacao": "2023-04-20",
-      "idPaciente": "6555611d9ce3d87b40496508",
-      "idVacina": "1",
+      "cpfPaciente": "01548744878",
+      "nomeVacina": "influenza trivalente",
       "dose": 1,
-      "sexo": "Feminino",
-      "profissionalSaude": [{
-        "id": 1,
-        "cpf": "02547899965",
-        "nome": "pablo escobar"
-      }]
+      "profissionalSaude": [
+        {
+            "cpf": "02547899965",
+            "nome": "pablo escobar"
+        }]
     }
 - Endpoint para deletar uma vacinação por ID:
 
@@ -89,17 +94,15 @@ O formato dos dados das vacinações é o seguinte:
 - PUT exemplo de resposta:
 
    {
-      "id": 1,
       "dataVacinacao": "2023-04-20",
-      "idPaciente": "6555611d9ce3d87b40496508",
-      "idVacina": "1",
+      "cpfPaciente": "01548744878",
+      "nomeVacina": "influenza trivalente",
       "dose": 1,
-      "sexo": "Feminino",
-      "profissionalSaude": [{
-        "id": 1,
-        "cpf": "02547899965",
-        "nome": "pablo escobar"
-      }]
+      "profissionalSaude": [
+        {
+            "cpf": "02547899965",
+            "nome": "pablo escobar"
+        }]
     }
 
 ###  Endpoints
