@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,13 +61,14 @@ public class VacinacaoController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível obter vacinação", ex);
         }
     }
-    @PostMapping("/registrar-vacinacao")
-    public Vacinacao registrarVacinacao(@RequestBody Vacinacao vacinacao){
-        try {
-            return vacinacaoService.registrarVacinacao(vacinacao);
-        }
+    @PostMapping()
+    public ResponseEntity<Vacinacao> registrarVacinacao(@RequestBody @Valid Vacinacao vacinacao){
+        try{
+            Vacinacao registroVacinacao = vacinacaoService.registrarVacinacao(vacinacao);
+            return  new ResponseEntity<>(registroVacinacao, HttpStatus.CREATED);
+       }
         catch (Exception ex){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível registrar vacinação", ex);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
     @PutMapping("/atualizar-vacinacao/{id}")

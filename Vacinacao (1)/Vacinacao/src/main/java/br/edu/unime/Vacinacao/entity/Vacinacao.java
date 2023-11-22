@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.Min;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
@@ -20,12 +18,15 @@ import javax.validation.constraints.NotNull;
 public class Vacinacao {
     @Id
     private String id;
-    @NotEmpty(message = "Data não foi informada!")
+    @NotNull(message = "Data de Vacinação não pode estar em branco.")
+    @PastOrPresent(message = "Só é possível registrar Data do dia ou antiga")
     private LocalDate dataVacinacao;
-    @NotEmpty(message = "paciente não foi informada!")
+    @NotBlank(message = "CPF do paciente não pode estar em branco.")
     private String cpfPaciente;
-    @NotEmpty(message = "Vacina não foi informada")
+    @NotBlank(message = "Nome da Vacina não pode estar em branco.")
     private String nomeVacina;
+    @Min(value = 1, message = "Número de doses não pode ser menor que 1.")
     private int dose;
+    @NotBlank(message = "Necessário informar profisisonal de Saúde.")
     private List<ProfissionalSaude> profissionalSaude;
 }
