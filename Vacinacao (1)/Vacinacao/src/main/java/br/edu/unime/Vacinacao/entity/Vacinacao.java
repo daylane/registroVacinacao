@@ -27,6 +27,6 @@ public class Vacinacao {
     private String nomeVacina;
     @Min(value = 1, message = "Número de doses não pode ser menor que 1.")
     private int dose;
-    @NotBlank(message = "Necessário informar profisisonal de Saúde.")
+    @NotNull(message = "Necessário informar profisisonal de Saúde.")
     private List<ProfissionalSaude> profissionalSaude;
 }

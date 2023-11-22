@@ -13,8 +13,9 @@ import org.springframework.data.annotation.Id;
 public class Vacina {
 
     @Id
-    private String Id;
+    private String id;
     private String fabricante;
+    private String vacina;
     private String lote;
     private LocalDate dataValidade;
     private int numeroDoses;

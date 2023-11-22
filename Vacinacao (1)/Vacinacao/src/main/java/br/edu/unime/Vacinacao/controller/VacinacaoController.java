@@ -65,20 +65,20 @@ public class VacinacaoController {
     public ResponseEntity<Vacinacao> registrarVacinacao(@RequestBody @Valid Vacinacao vacinacao){
         try{
             Vacinacao registroVacinacao = vacinacaoService.registrarVacinacao(vacinacao);
-            return  new ResponseEntity<>(registroVacinacao, HttpStatus.CREATED);
+            return new ResponseEntity<>(registroVacinacao, HttpStatus.CREATED);
        }
         catch (Exception ex){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
-    @PutMapping("/atualizar-vacinacao/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Vacinacao> atualizarVacinacao(@PathVariable String id, @RequestBody Vacinacao vacinacao ){
         try {
-            vacinacaoService.atualizarVacinacao(id,vacinacao);
-            return ResponseEntity.ok().body(vacinacao);
+           Vacinacao atualizarVacinacao =  vacinacaoService.atualizarVacinacao(id,vacinacao);
+            return new ResponseEntity<>(atualizarVacinacao, HttpStatus.ACCEPTED);
         }
         catch (Exception ex){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível atualizar vacinação", ex);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
         }
     }
     @DeleteMapping("/deletar-vacinacao/{id}")

@@ -11,9 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,10 +59,18 @@ public class VacinacaoService {
 
         return pacienteDoseDto;
     }
+
     public Vacinacao registrarVacinacao(Vacinacao vacinacao){
         logger.info("Inserindo vacinacao");
-        vacinacaoRepository.insert(vacinacao);
-        return vacinacao;
+
+        List<Vacina> vacina = vacinaHttpClient.listarVacinasComFiltro(null, vacinacao.getNomeVacina());
+
+         if(vacina.isEmpty()){
+             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Erro ao encontrar vacina");
+         }else {
+            vacinacaoRepository.insert(vacinacao);
+            return vacinacao;
+       }
     }
     public Vacinacao atualizarVacinacao(String id, Vacinacao vacinacao){
         Optional<Vacinacao> vacinacaoRegistrada = obterVacinacaoPorId(id);
@@ -73,7 +83,7 @@ public class VacinacaoService {
 
             return vacinacaoRegistrada.get();
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Erro ao encontrar vacina");
     }
     public void deletarVacinacao(String id) {
      Optional<Vacinacao> vacinacao = obterVacinacaoPorId(id);
@@ -114,7 +124,7 @@ public class VacinacaoService {
         LocalDate dataHoje = LocalDate.now();
 
         logger.info("procurando vacina" );
-        List<VacinasAplicadasPorFabricanteDto> vacina = vacinaHttpClient.listarVacinas();
+        List<VacinasAplicadasPorFabricanteDto> vacina = vacinaHttpClient.listarVacinas(null, null);
 
         logger.info("procurando Paciente" );
         List<PacientePorEstadoDto> paciente = pacienteHttpClient.obterPacienteEstado(uf.toUpperCase());
