@@ -13,9 +13,9 @@ import java.util.List;
 
 @FeignClient(value = "Vacinas", url = "localhost:8084/api/")
 public interface VacinaHttpClient {
+    //@GetMapping("vacinas")
+    //public List<VacinasAplicadasPorFabricanteDto> listarVacinas(@RequestParam(required = false) String fabricante, String vacina);
     @GetMapping("vacinas")
-    public List<VacinasAplicadasPorFabricanteDto> listarVacinas(@RequestParam(required = false) String fabricante, String vacina);
-    @GetMapping("vacinas")
-    public List<Vacina> listarVacinasComFiltro(@RequestParam(required = false) String fabricante, String vacina);
+    public List<Vacina> listarVacinas(@RequestParam(required = false) String fabricante, @RequestParam(required = false) String vacina);
 
 }

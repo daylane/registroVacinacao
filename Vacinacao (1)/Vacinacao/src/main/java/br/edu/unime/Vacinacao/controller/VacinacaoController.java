@@ -4,9 +4,12 @@ import br.edu.unime.Vacinacao.dto.PacienteDoseAtrasadaDto;
 import br.edu.unime.Vacinacao.dto.PacienteDoseDto;
 import br.edu.unime.Vacinacao.dto.VacinasAplicadasDto;
 import br.edu.unime.Vacinacao.entity.Paciente;
+import br.edu.unime.Vacinacao.entity.Vacina;
 import br.edu.unime.Vacinacao.entity.Vacinacao;
+import br.edu.unime.Vacinacao.exceptions.NotFoundExceptionHandler;
 import br.edu.unime.Vacinacao.httpClient.PacienteHttpClient;
 import br.edu.unime.Vacinacao.service.VacinacaoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,7 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("api/vacinacao")
 public class VacinacaoController {
@@ -61,33 +65,45 @@ public class VacinacaoController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível obter vacinação", ex);
         }
     }
+    @GetMapping("/vacinas")
+    public List<Vacina> obterVacinas(@RequestParam(required = false) String fabricante, @RequestParam(required = false) String nomeVacina)
+    {
+        try{
+            return vacinacaoService.obterVacinas(fabricante,nomeVacina);
+        }
+        catch (Exception ex){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível obter vacinação", ex);
+        }
+    }
+
     @PostMapping()
     public ResponseEntity<Vacinacao> registrarVacinacao(@RequestBody @Valid Vacinacao vacinacao){
         try{
             Vacinacao registroVacinacao = vacinacaoService.registrarVacinacao(vacinacao);
             return new ResponseEntity<>(registroVacinacao, HttpStatus.CREATED);
        }
-        catch (Exception ex){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        catch (NotFoundExceptionHandler ex){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
         }
     }
+
     @PutMapping("/{id}")
-    public ResponseEntity<Vacinacao> atualizarVacinacao(@PathVariable String id, @RequestBody Vacinacao vacinacao ){
+    public ResponseEntity<Vacinacao> atualizarVacinacao(@PathVariable String id, @RequestBody @Valid Vacinacao vacinacao ){
         try {
            Vacinacao atualizarVacinacao =  vacinacaoService.atualizarVacinacao(id,vacinacao);
             return new ResponseEntity<>(atualizarVacinacao, HttpStatus.ACCEPTED);
         }
-        catch (Exception ex){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        catch (NotFoundExceptionHandler ex){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível encontrar Vacinação", ex);
         }
     }
-    @DeleteMapping("/deletar-vacinacao/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Vacinacao> deletarVacinacao(@PathVariable String id){
         try {
             vacinacaoService.deletarVacinacao(id);
             return ResponseEntity.noContent().build();
-        }catch (Exception ex){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível deletar vacinação", ex);
+        }catch (NotFoundExceptionHandler ex){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível deletar vacinação", ex);
         }
     }
     @GetMapping("dosePaciente/{id}")
