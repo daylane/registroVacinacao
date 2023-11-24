@@ -6,7 +6,9 @@ import br.edu.unime.Vacinacao.dto.VacinasAplicadasDto;
 import br.edu.unime.Vacinacao.entity.Paciente;
 import br.edu.unime.Vacinacao.entity.Vacina;
 import br.edu.unime.Vacinacao.entity.Vacinacao;
+import br.edu.unime.Vacinacao.exceptions.BadRequestException;
 import br.edu.unime.Vacinacao.exceptions.NotFoundExceptionHandler;
+import br.edu.unime.Vacinacao.exceptions.VacinaNotFoundException;
 import br.edu.unime.Vacinacao.httpClient.PacienteHttpClient;
 import br.edu.unime.Vacinacao.service.VacinacaoService;
 import lombok.extern.slf4j.Slf4j;
@@ -72,19 +74,15 @@ public class VacinacaoController {
             return vacinacaoService.obterVacinas(fabricante,nomeVacina);
         }
         catch (Exception ex){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível obter vacinação", ex);
+            throw new VacinaNotFoundException("Não foi possível obter vacinação");
         }
     }
 
     @PostMapping()
     public ResponseEntity<Vacinacao> registrarVacinacao(@RequestBody @Valid Vacinacao vacinacao){
-        try{
             Vacinacao registroVacinacao = vacinacaoService.registrarVacinacao(vacinacao);
-            return new ResponseEntity<>(registroVacinacao, HttpStatus.CREATED);
-       }
-        catch (NotFoundExceptionHandler ex){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
-        }
+            return ResponseEntity.status(HttpStatus.CREATED).body(registroVacinacao);
+
     }
 
     @PutMapping("/{id}")
@@ -106,7 +104,7 @@ public class VacinacaoController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível deletar vacinação", ex);
         }
     }
-    @GetMapping("dosePaciente/{id}")
+    @GetMapping("/dosePaciente/{id}")
     public PacienteDoseDto obterDosePaciente(@PathVariable String id){
         try{
             return  vacinacaoService.obterDosePacienteporIdvacinacao(id);
@@ -116,7 +114,7 @@ public class VacinacaoController {
         }
     }
 
-    @GetMapping("totalVacinas")
+    @GetMapping("/totalVacinas")
     public VacinasAplicadasDto totalVacinas(@RequestParam(required = false) String uf){
         try{
             return  vacinacaoService.vacinasAplicadas(uf);

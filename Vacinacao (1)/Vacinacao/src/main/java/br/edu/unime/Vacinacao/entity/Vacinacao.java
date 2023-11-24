@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -22,6 +23,7 @@ public class Vacinacao {
     @PastOrPresent(message = "Só é possível registrar Data do dia ou antiga")
     private LocalDate dataVacinacao;
     @NotBlank(message = "CPF do paciente não pode estar em branco.")
+    @CPF(message = "cpf invalido")
     private String cpfPaciente;
     @NotBlank(message = "Nome da Vacina não pode estar em branco.")
     private String nomeVacina;

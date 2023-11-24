@@ -4,7 +4,9 @@ import br.edu.unime.Vacinacao.dto.*;
 import br.edu.unime.Vacinacao.entity.Paciente;
 import br.edu.unime.Vacinacao.entity.Vacina;
 import br.edu.unime.Vacinacao.entity.Vacinacao;
+import br.edu.unime.Vacinacao.exceptions.BadRequestException;
 import br.edu.unime.Vacinacao.exceptions.NotFoundExceptionHandler;
+import br.edu.unime.Vacinacao.exceptions.VacinaNotFoundException;
 import br.edu.unime.Vacinacao.httpClient.PacienteHttpClient;
 import br.edu.unime.Vacinacao.httpClient.VacinaHttpClient;
 import br.edu.unime.Vacinacao.repository.VacinacaoRepository;
@@ -35,13 +37,19 @@ public class VacinacaoService {
     VacinaHttpClient vacinaHttpClient;
 
     public List<Vacinacao> obterVacinacoes() {
-        logger.info("Buscando todas as vacinacao por id;");
+        logger.info("Buscando todas as vacinações ");
         return vacinacaoRepository.findAll();
     }
 
     public Optional<Vacinacao> obterVacinacaoPorId(String id) {
-        logger.info("Buscando vacinacao por id;" + id);
-        return vacinacaoRepository.findById(id);
+        Optional<Vacinacao> vacinacaoOptional = vacinacaoRepository.findById(id);
+
+        if (vacinacaoOptional.isPresent()) {
+            logger.info("Buscando vacinacao por id;" + id);
+            return vacinacaoOptional;
+        } else {
+            throw new VacinaNotFoundException("Vacinao não encontrado com o ID: " + id);
+        }
 
     }
 
@@ -69,51 +77,79 @@ public class VacinacaoService {
 
     public Vacinacao registrarVacinacao(Vacinacao vacinacao) {
         logger.info("Inserindo vacinacao");
-        List<Vacina> vacina = vacinaHttpClient.listarVacinas(null, vacinacao.getNomeVacina());
 
-        if (vacina.isEmpty()) {
-            throw new NotFoundExceptionHandler("Vacina não encontrada");
+        if (vacinacaoRepository.existsByCpfPacienteAndDataVacinacao(vacinacao.getCpfPaciente(), vacinacao.getDataVacinacao())) {
+            throw new BadRequestException("O paciente já tomou uma vacina nesta data.");
+        }
 
+        List<Vacina> vacinas = vacinaHttpClient.listarVacinas(null, vacinacao.getNomeVacina());
+
+        if (vacinas.isEmpty()) {
+            throw new NotFoundExceptionHandler("Nome da Vacina não encontrada");
         } else {
             vacinacaoRepository.insert(vacinacao);
+            logger.info("Vacina inserida");
             return vacinacao;
         }
     }
 
     public List<Vacina> obterVacinas(String fabricante, String nomeVacina) {
         logger.info("Buscando Vacina");
+        fabricante = fabricante != null ? fabricante.trim().toLowerCase() : null;
+        nomeVacina = nomeVacina != null ? nomeVacina.trim().toLowerCase() : null;
 
-        List<Vacina> vacina = vacinaHttpClient.listarVacinas(fabricante, nomeVacina);
-        logger.info("vOLTOU? " + vacina.get(0).getVacina());
-        if (vacina.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, " Vacina não encontrada");
+        List<Vacina> vacinas;
+
+        if (fabricante != null && !fabricante.trim().isEmpty()) {
+            vacinas = vacinaHttpClient.listarVacinas(fabricante, nomeVacina);
+        } else {
+            vacinas = vacinaHttpClient.listarVacinas(null, nomeVacina);
         }
-        return vacina;
+        if (vacinas.isEmpty()) {
+            throw new NotFoundExceptionHandler("Nenhuma vacina encontrada para o nome: " + nomeVacina);
+        }
+
+        logger.info("Nome da Vacina encontrada: " + vacinas.get(0).getVacina());
+
+        return vacinas;
 
     }
 
     public Vacinacao atualizarVacinacao(String id, Vacinacao vacinacao) {
-
         Optional<Vacinacao> vacinacaoRegistrada = obterVacinacaoPorId(id);
+
         if (vacinacaoRegistrada.isPresent()) {
             logger.info("Atualizando Vacinacao;");
             Vacinacao vacinacaoExistente = vacinacaoRegistrada.get();
 
-             vacinacaoExistente.setCpfPaciente(vacinacao.getCpfPaciente());
-             vacinacaoExistente.setDataVacinacao(vacinacao.getDataVacinacao());
-             vacinacaoExistente.setNomeVacina(vacinacao.getNomeVacina());
-             vacinacaoExistente.setProfissionalSaude(vacinacao.getProfissionalSaude());
+            if (!vacinacaoExistente.getNomeVacina().equals(vacinacao.getNomeVacina())) {
+                List<Vacina> vacinasNaOutraAPI = vacinaHttpClient.listarVacinas(null, vacinacao.getNomeVacina());
+
+                if (vacinasNaOutraAPI.isEmpty()) {
+                    throw new NotFoundExceptionHandler("Insira o nome correto da vacina");
+                }
+            }
+
+            vacinacaoExistente.setCpfPaciente(vacinacao.getCpfPaciente());
+            vacinacaoExistente.setDataVacinacao(vacinacao.getDataVacinacao());
+            vacinacaoExistente.setNomeVacina(vacinacao.getNomeVacina());
+            vacinacaoExistente.setProfissionalSaude(vacinacao.getProfissionalSaude());
 
             return vacinacaoRepository.save(vacinacaoExistente);
         }
-        throw new NotFoundExceptionHandler("Não foi possivel encontrar Vacinação");
+
+        throw new NotFoundExceptionHandler("Não foi possível encontrar Vacinação");
     }
 
     public void deletarVacinacao(String id) {
-        logger.info("Deletando Vacinacao;");
         Optional<Vacinacao> vacinacao = obterVacinacaoPorId(id);
-        vacinacao.ifPresent(value -> vacinacaoRepository.delete(value));
-        throw new NotFoundExceptionHandler("Vacinação não encontrado com o ID: " + id);
+
+        if (vacinacao.isPresent()) {
+            vacinacaoRepository.delete(vacinacao.get());
+            logger.info("Vacinação removida");
+        } else {
+            throw new NotFoundExceptionHandler("Vacinação não encontrado com o ID: " + id);
+        }
     }
 
     public VacinasAplicadasDto vacinasAplicadas(String uf) {
@@ -121,24 +157,26 @@ public class VacinacaoService {
 
         if (StringUtils.isEmpty(uf)) {
             logger.info("Buscando total sem uf");
-            var vacinas = vacinacaoRepository.count();
-            vacinasAplicadasDto.setTotalVacinas(vacinas);
+            long totalVacinas = vacinacaoRepository.count();
+            vacinasAplicadasDto.setTotalVacinas(totalVacinas);
 
             return vacinasAplicadasDto;
         } else {
             logger.info("Buscando total com uf");
             List<PacientePorEstadoDto> pacientePorEstado = pacienteHttpClient.obterPacienteEstado(uf.toUpperCase());
 
-            for (PacientePorEstadoDto paciente : pacientePorEstado) {
+            long totalVacinas = 0;
 
+            for (PacientePorEstadoDto paciente : pacientePorEstado) {
                 logger.info("entrou no for");
                 String cpf = paciente.getCpf();
 
                 long vacinacao = vacinacaoRepository.countByCpfPaciente(cpf);
 
-                vacinasAplicadasDto.setTotalVacinas(vacinacao);
-
+                totalVacinas += vacinacao;
             }
+
+            vacinasAplicadasDto.setTotalVacinas(totalVacinas);
 
             return vacinasAplicadasDto;
         }
