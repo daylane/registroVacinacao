@@ -15,8 +15,8 @@ import java.util.Optional;
 @FeignClient(value = "Pacientes", url = "localhost:8081/api/")
 public interface PacienteHttpClient {
 
-    @GetMapping("Pacientes/{id}")
-    public Paciente obterpaciente(@PathVariable("id") String id);
+    @GetMapping("Pacientes/por-cpf/{cpf}")
+    public Paciente obterpaciente(@PathVariable String cpf);
 
     @GetMapping("Pacientes/por-uf")
     public  List<PacientePorEstadoDto> obterPacienteEstado(@RequestParam(required = false) String uf);

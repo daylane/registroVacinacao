@@ -47,19 +47,24 @@ public class VacinacaoService {
 
     public PacienteDoseDto obterDosePacienteporIdvacinacao(String id) {
         logger.info("Pesquisando Vacinação;");
-        var vacinacao = obterVacinacaoPorId(id);
-        var paciente = pacienteHttpClient.obterpaciente(vacinacao.get().getCpfPaciente());
-        logger.info("Pesquisando paciente;" + (paciente != null ? paciente.getNome() : "Não encontrado"));
-
-        PacienteDoseDto pacienteDoseDto = new PacienteDoseDto(
-                paciente.getNome(),
-                paciente.getCpf(),
-                paciente.getDataNascimento(),
-                vacinacao.get().getDose(),
-                vacinacao.get().getDataVacinacao()
-        );
-
-        return pacienteDoseDto;
+        Optional<Vacinacao> vacinacoes = vacinacaoRepository.findById(id);
+        if(vacinacoes.isPresent()){
+            logger.info("Pesquisando Vacina;");
+            Paciente paciente = pacienteHttpClient.obterpaciente(vacinacoes.get().getCpfPaciente());
+            logger.info("Pesquisando paciente;" + (paciente != null ? paciente.getNome() : "Não encontrado"));
+            if(paciente != null){
+                return new  PacienteDoseDto(
+                        paciente.getNome(),
+                        paciente.getCpf(),
+                        paciente.getDataNascimento(),
+                        vacinacoes.get().getDose(),
+                        vacinacoes.get().getDataVacinacao(),
+                        vacinacoes.get().getNomeVacina()
+                );
+            }
+            throw new NotFoundExceptionHandler("Paciente não cadastrado.");
+        }
+        throw new NotFoundExceptionHandler("Vacinação não cadastrada.");
     }
 
     public Vacinacao registrarVacinacao(Vacinacao vacinacao) {

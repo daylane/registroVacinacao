@@ -18,6 +18,7 @@ public class PacienteDoseDto {
     private LocalDate dataNascimento;
     private int doses;
     private LocalDate dataVacinacao;
+    private String NomeVacina;
 
 
 
